@@ -6,11 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/yourusername/your-repo.git'
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
@@ -20,7 +15,7 @@ pipeline {
 
         stage('Run Application') {
             steps {
-                sh 'node app.js'
+                sh 'node test.js'
             }
         }
     }
