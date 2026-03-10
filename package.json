@@ -1,0 +1,23 @@
+{
+  "name": "devops",
+  "version": "1.0.0",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gopisankar-id17/Devops.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gopisankar-id17/Devops/issues"
+  },
+  "homepage": "https://github.com/gopisankar-id17/Devops#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
