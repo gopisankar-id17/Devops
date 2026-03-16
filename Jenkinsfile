@@ -45,11 +45,12 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                sh 'ssh $VM_USER@$VM_IP docker pull $DOCKER_IMAGE'
-                sh 'ssh $VM_USER@$VM_IP docker stop myapp || true'
-                sh 'ssh $VM_USER@$VM_IP docker run -d --name myapp -p 80:3000 $DOCKER_IMAGE'
-            }
-        }
+    steps {
+        sh 'ssh $VM_USER@$VM_IP docker pull $DOCKER_IMAGE'
+        sh 'ssh $VM_USER@$VM_IP "docker stop myapp || true"'
+        sh 'ssh $VM_USER@$VM_IP "docker rm myapp || true"'
+        sh 'ssh $VM_USER@$VM_IP "docker run -d --name myapp -p 80:3000 $DOCKER_IMAGE"'
+    }
+}
     }
 }
