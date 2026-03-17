@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "gopins/devops-node-app"
-        VM_IP = "35.188.219.161"
+        VM_IP = "136.116.147.49"
         VM_USER = "gopins172"
     }
 
