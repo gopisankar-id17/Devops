@@ -1,38 +1,42 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
+
 const app = express();
-
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-let todos = [];
+// Connect to MongoDB Atlas
+// MONGO_URL comes from environment variable (never hardcode your password)
+const MONGO_URL = process.env.MONGO_URL;
 
-// Get all todos
-app.get('/todos', (req, res) => {
-    res.json(todos);
+mongoose.connect(MONGO_URL)
+  .then(() => console.log('MongoDB Atlas connected'))
+  .catch(err => console.log('DB error:', err));
+
+// Todo schema
+const Todo = mongoose.model('Todo', {
+  text: String,
+  done: { type: Boolean, default: false }
 });
 
-// Add todo
-app.post('/todos', (req, res) => {
-    const todo = {
-        id: Date.now(),
-        text: req.body.text,
-        completed: false
-    };
-    todos.push(todo);
-    res.json(todo);
+// GET all todos
+app.get('/todos', async (req, res) => {
+  const todos = await Todo.find();
+  res.json(todos);
 });
 
-// Delete todo
-app.delete('/todos/:id', (req, res) => {
-    todos = todos.filter(t => t.id !== parseInt(req.params.id));
-    res.json({ success: true });
+// POST create todo
+app.post('/todos', async (req, res) => {
+  const todo = new Todo({ text: req.body.text });
+  await todo.save();
+  res.json(todo);
 });
 
-// Toggle complete
-app.patch('/todos/:id', (req, res) => {
-    const todo = todos.find(t => t.id === parseInt(req.params.id));
-    if (todo) todo.completed = !todo.completed;
-    res.json(todo);
+// DELETE a todo
+app.delete('/todos/:id', async (req, res) => {
+  await Todo.findByIdAndDelete(req.params.id);
+  res.json({ message: 'deleted' });
 });
 
-app.listen(3000, () => console.log('Todo app running on port 3000'));
+app.listen(3000, () => console.log('Server running on port 3000'));
