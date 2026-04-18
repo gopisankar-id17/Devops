@@ -7,8 +7,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "gopins/devops-node-app"
-        VM_IP = "35.188.219.161"
-        VM_USER = "gopins172"
+        VM_IP        = "35.188.219.161"
+        VM_USER      = "gopins172"
     }
 
     stages {
@@ -44,14 +44,23 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-    steps {
-        sh 'ssh $VM_USER@$VM_IP docker pull $DOCKER_IMAGE'
-        sh 'ssh $VM_USER@$VM_IP "docker stop myapp || true"'
-        sh 'ssh $VM_USER@$VM_IP "docker rm myapp || true"'
-        sh 'ssh $VM_USER@$VM_IP "docker run -d --name myapp -p 80:3000 $DOCKER_IMAGE"'
-    }
-}
-    }
-}
+        stage('Deploy to GCP VM') {
+            steps {
+                sh 'ssh $VM_USER@$VM_IP "cd ~/app && git pull"'
+                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose down"'
+                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose pull"'
+                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose up -d"'
+            }
+        }
 
+    }
+
+    post {
+        success {
+            echo "Deployment successful - build #${BUILD_NUMBER}"
+        }
+        failure {
+            echo "Pipeline failed - check logs"
+        }
+    }
+}
