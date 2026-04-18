@@ -1,8 +1,9 @@
 services:
 
   mongo:
-    image: mongo:6
+    image: mongo:4.4
     restart: always
+    command: mongod --wiredTigerCacheSizeGB 0.25
     volumes:
       - mongo-data:/data/db
     networks:
@@ -32,6 +33,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    user: "472"
     ports:
       - "3001:3000"
     environment:
