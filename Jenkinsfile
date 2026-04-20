@@ -15,19 +15,19 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                bat 'npm test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
@@ -38,18 +38,17 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
-                    sh 'docker push $DOCKER_IMAGE'
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+                    bat 'docker push %DOCKER_IMAGE%'
                 }
             }
         }
 
         stage('Deploy to GCP VM') {
             steps {
-                sh 'ssh $VM_USER@$VM_IP "cd ~/app && git pull"'
-                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose down"'
-                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose pull"'
-                sh 'ssh $VM_USER@$VM_IP "cd ~/app && docker compose up -d"'
+                bat """
+                ssh %VM_USER%@%VM_IP% "docker pull %DOCKER_IMAGE% && docker stop devops-node-app || true && docker rm devops-node-app || true && docker run -d -p 80:3000 --name devops-node-app %DOCKER_IMAGE%"
+                """
             }
         }
 
@@ -57,7 +56,7 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful - build #${BUILD_NUMBER}"
+            echo "Deployment successful"
         }
         failure {
             echo "Pipeline failed - check logs"
